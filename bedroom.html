@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furniture Shop | Quarto</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="logo">FURNITURE SHOP</div>
+
+    <nav class="nav-center">
+        <a href="shop-all.html">SHOP ALL</a>
+        <a href="decor.html">DECOR</a>
+        <a href="office.html">OFFICE</a>
+        <a href="living-room.html">LIVING ROOM</a>
+        <a href="bedroom.html">BEDROOM</a>
+    </nav>
+
+    <nav class="nav-right">
+        <a href="story.html">STORY</a>
+        <a href="contact.html">CONTACT</a>
+        <a href="track-order.html">TRACK ORDER</a>
+        <a href="help.html">HELP</a>
+        <a href="login.html" id="loginBtn">LOGIN</a>
+        <span class="cart-icon" id="cartIcon">🛒 <span id="cartCount">0</span></span>
+    </nav>
+</header>
+
+<section class="produtos-container">
+    <aside class="sidebar">
+        <h3>FILTROS QUARTO</h3>
+
+        <label>Tipo</label>
+        <select id="typeFilter">
+            <option value="all">Todos</option>
+            <option value="Cama">Camas</option>
+            <option value="Mesa">Mesas de Cabeceira</option>
+            <option value="Guarda-Roupa">Guarda-Roupas</option>
+            <option value="Cómoda">Cómodas</option>
+            <option value="Espelho">Espelhos</option>
+        </select>
+
+        <label>Preço</label>
+        <select id="priceFilter">
+            <option value="all">Todos os Preços</option>
+            <option value="0-150">0 € – 150 €</option>
+            <option value="150-300">150 € – 300 €</option>
+            <option value="300+">300 € +</option>
+        </select>
+
+        <div style="margin-top: 20px;">
+            <label>
+                <input type="checkbox" id="saleFilter"> Apenas Promoções
+            </label>
+        </div>
+    </aside>
+
+    <div>
+        <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 28px; margin-bottom: 10px;">Quarto</h2>
+            <p style="color: #666;">Transforme o seu quarto num refúgio de conforto</p>
+            <p id="productCount" style="color: #666; margin-top: 10px;"></p>
+        </div>
+        <div class="produtos-grid" id="productsGrid">
+            <!-- Produtos serão inseridos aqui -->
+        </div>
+    </div>
+</section>
+
+<!-- CART MODAL -->
+<div id="cartModal" class="modal">
+    <div class="modal-content cart-modal-content">
+        <span class="close" id="closeCart">&times;</span>
+        <h2>Carrinho de Compras</h2>
+        <div id="cartItems"></div>
+        <div class="cart-total">
+            <strong>Total: €<span id="cartTotal">0.00</span></strong>
+        </div>
+        <button class="hero-btn" style="width: 100%; margin-top: 20px;" onclick="window.location.href='checkout.html'">Finalizar Compra</button>
+    </div>
+</div>
+
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/auth.js"></script>
+<script>
+function renderProducts() {
+    const grid = document.getElementById('productsGrid');
+    const priceFilter = document.getElementById('priceFilter').value;
+    const saleFilter = document.getElementById('saleFilter').checked;
+    const productCount = document.getElementById('productCount');
+
+    // Filtrar por categoria
+    let filtered = products.filter(p => p.category === 'Bedroom');
+
+    // Filtrar por preço
+    if (priceFilter !== 'all') {
+        if (priceFilter === '0-150') {
+            filtered = filtered.filter(p => p.price <= 150);
+        } else if (priceFilter === '150-300') {
+            filtered = filtered.filter(p => p.price > 150 && p.price <= 300);
+        } else if (priceFilter === '300+') {
+            filtered = filtered.filter(p => p.price > 300);
+        }
+    }
+
+    // Filtrar por promoção
+    if (saleFilter) {
+        filtered = filtered.filter(p => p.sale);
+    }
+
+    // Atualizar contador
+    productCount.textContent = `${filtered.length} produto${filtered.length !== 1 ? 's' : ''}`;
+
+    // Renderizar
+    grid.innerHTML = filtered.map(product => `
+        <div class="card-produto" onclick="window.location.href='product.html?id=${product.id}'">
+            ${product.sale ? '<span class="tag-sale">SALE</span>' : ''}
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>€${product.price.toFixed(2)}</p>
+        </div>
+    `).join('');
+}
+
+// Event listeners
+document.getElementById('priceFilter').addEventListener('change', renderProducts);
+document.getElementById('saleFilter').addEventListener('change', renderProducts);
+
+// Renderizar ao carregar
+renderProducts();
+</script>
+
+</body>
+</html>

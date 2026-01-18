@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furniture Shop | Todos os Produtos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="logo">FURNITURE SHOP</div>
+
+    <nav class="nav-center">
+        <a href="shop-all.html">SHOP ALL</a>
+        <a href="decor.html">DECOR</a>
+        <a href="office.html">OFFICE</a>
+        <a href="living-room.html">LIVING ROOM</a>
+        <a href="bedroom.html">BEDROOM</a>
+    </nav>
+
+    <nav class="nav-right">
+        <a href="story.html">STORY</a>
+        <a href="contact.html">CONTACT</a>
+        <a href="track-order.html">TRACK ORDER</a>
+        <a href="help.html">HELP</a>
+        <a href="login.html" id="loginBtn">LOGIN</a>
+        <span class="cart-icon" id="cartIcon">🛒 <span id="cartCount">0</span></span>
+    </nav>
+</header>
+
+<section class="produtos-container">
+    <aside class="sidebar">
+        <h3>FILTROS</h3>
+
+        <label>Categoria</label>
+        <select id="categoryFilter">
+            <option value="all">Todos os Produtos</option>
+            <option value="Decor">Decoração</option>
+            <option value="Office">Escritório</option>
+            <option value="Bedroom">Quarto</option>
+            <option value="Living Room">Sala de Estar</option>
+        </select>
+
+        <label>Preço</label>
+        <select id="priceFilter">
+            <option value="all">Todos os Preços</option>
+            <option value="0-50">0 € – 50 €</option>
+            <option value="50-100">50 € – 100 €</option>
+            <option value="100-300">100 € – 300 €</option>
+            <option value="300+">300 € +</option>
+        </select>
+
+        <label>Ordenar por</label>
+        <select id="sortFilter">
+            <option value="default">Padrão</option>
+            <option value="price-asc">Preço: Baixo para Alto</option>
+            <option value="price-desc">Preço: Alto para Baixo</option>
+            <option value="name">Nome A-Z</option>
+        </select>
+
+        <div style="margin-top: 20px;">
+            <label>
+                <input type="checkbox" id="saleFilter"> Apenas Promoções
+            </label>
+        </div>
+    </aside>
+
+    <div>
+        <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-size: 28px;">Todos os Produtos</h2>
+            <p id="productCount" style="color: #666;"></p>
+        </div>
+        <div class="produtos-grid" id="productsGrid">
+            <!-- Produtos serão inseridos aqui via JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- CART MODAL -->
+<div id="cartModal" class="modal">
+    <div class="modal-content cart-modal-content">
+        <span class="close" id="closeCart">&times;</span>
+        <h2>Carrinho de Compras</h2>
+        <div id="cartItems"></div>
+        <div class="cart-total">
+            <strong>Total: €<span id="cartTotal">0.00</span></strong>
+        </div>
+        <button class="hero-btn" style="width: 100%; margin-top: 20px;" onclick="window.location.href='checkout.html'">Finalizar Compra</button>
+    </div>
+</div>
+
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/auth.js"></script>
+<script>
+// Renderizar produtos
+function renderProducts() {
+    const grid = document.getElementById('productsGrid');
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    const priceFilter = document.getElementById('priceFilter').value;
+    const sortFilter = document.getElementById('sortFilter').value;
+    const saleFilter = document.getElementById('saleFilter').checked;
+    const productCount = document.getElementById('productCount');
+
+    let filtered = products;
+
+    // Filtrar por categoria
+    if (categoryFilter !== 'all') {
+        filtered = filtered.filter(p => p.category === categoryFilter);
+    }
+
+    // Filtrar por preço
+    if (priceFilter !== 'all') {
+        if (priceFilter === '0-50') {
+            filtered = filtered.filter(p => p.price <= 50);
+        } else if (priceFilter === '50-100') {
+            filtered = filtered.filter(p => p.price > 50 && p.price <= 100);
+        } else if (priceFilter === '100-300') {
+            filtered = filtered.filter(p => p.price > 100 && p.price <= 300);
+        } else if (priceFilter === '300+') {
+            filtered = filtered.filter(p => p.price > 300);
+        }
+    }
+
+    // Filtrar por promoção
+    if (saleFilter) {
+        filtered = filtered.filter(p => p.sale);
+    }
+
+    // Ordenar
+    if (sortFilter === 'price-asc') {
+        filtered.sort((a, b) => a.price - b.price);
+    } else if (sortFilter === 'price-desc') {
+        filtered.sort((a, b) => b.price - a.price);
+    } else if (sortFilter === 'name') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    // Atualizar contador
+    productCount.textContent = `${filtered.length} produto${filtered.length !== 1 ? 's' : ''}`;
+
+    // Renderizar
+    grid.innerHTML = filtered.map(product => `
+        <div class="card-produto" onclick="window.location.href='product.html?id=${product.id}'">
+            ${product.sale ? '<span class="tag-sale">SALE</span>' : ''}
+            <img src="${product.image}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>€${product.price.toFixed(2)}</p>
+        </div>
+    `).join('');
+}
+
+// Event listeners
+document.getElementById('categoryFilter').addEventListener('change', renderProducts);
+document.getElementById('priceFilter').addEventListener('change', renderProducts);
+document.getElementById('sortFilter').addEventListener('change', renderProducts);
+document.getElementById('saleFilter').addEventListener('change', renderProducts);
+
+// Renderizar ao carregar
+renderProducts();
+</script>
+
+</body>
+</html>
